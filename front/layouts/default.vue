@@ -43,4 +43,7 @@ li {
   margin: 0 auto;
   position: relative;
 }
+a {
+  text-decoration: none;
+}
 </style>
