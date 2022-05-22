@@ -131,6 +131,10 @@ export default {
       background-color: #333333;
     }
   }
+  .nuxt-link-exact-active {
+    background-color: #333333;
+    color: #ffffff;
+  }
 }
 .news-list {
   .item {

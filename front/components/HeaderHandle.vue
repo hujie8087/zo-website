@@ -66,32 +66,32 @@ export default {
         },
         {
           key: 'Products',
-          path: '/Products',
+          path: '/products',
           title: '产品中心',
         },
         {
           key: 'News',
-          path: '/News',
+          path: '/news',
           title: '新闻中心',
         },
         {
           key: 'Case',
-          path: '/Case',
+          path: '/case',
           title: '项目案例',
         },
         {
           key: 'Solutions',
-          path: '/Solutions',
+          path: '/solutions',
           title: '解决方案',
         },
         {
           key: 'About',
-          path: '/About',
+          path: '/about',
           title: '关于我们',
         },
         {
           key: 'Contact',
-          path: '/Contact',
+          path: '/contact',
           title: '联系我们',
         },
       ],
