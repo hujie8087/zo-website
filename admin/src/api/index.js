@@ -1,9 +1,9 @@
 import request from '../utils/request';
 
-export const fetchData = query => {
+export const fetchData = (query) => {
     return request({
-        url: './table.json',
+        url: './api/getProducts',
         method: 'get',
-        params: query
+        params: query,
     });
 };
