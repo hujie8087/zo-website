@@ -50,167 +50,182 @@
 </template>
 
 <script>
-import { computed, watch } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
+import { computed, watch } from "vue";
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 export default {
   setup() {
     const items = [
       {
-        icon: 'el-icon-lx-goods',
-        index: '1',
-        title: '产品中心',
+        icon: "el-icon-lx-goods",
+        index: "1",
+        title: "产品中心",
         subs: [
           {
-            index: '/productType',
-            title: '类别管理',
+            index: "/productType",
+            title: "类别管理",
           },
           {
-            index: '/products',
-            title: '内容管理',
+            index: "/products",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-news',
-        index: '2',
-        title: '新闻资讯',
+        icon: "el-icon-news",
+        index: "2",
+        title: "新闻资讯",
         subs: [
           {
-            index: '/newsType',
-            title: '类别管理',
+            index: "/newsType",
+            title: "类别管理",
           },
           {
-            index: '/news',
-            title: '内容管理',
+            index: "/news",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-lx-apps',
-        index: '3',
-        title: '项目案例',
+        icon: "el-icon-lx-apps",
+        index: "3",
+        title: "项目案例",
         subs: [
           {
-            index: '/caseType',
-            title: '类别管理',
+            index: "/caseType",
+            title: "类别管理",
           },
           {
-            index: '/case',
-            title: '内容管理',
+            index: "/case",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-lx-cascades',
-        index: '4',
-        title: '解决方案',
+        icon: "el-icon-lx-cascades",
+        index: "4",
+        title: "解决方案",
         subs: [
           {
-            index: '/solutionType',
-            title: '类别管理',
+            index: "/solutionType",
+            title: "类别管理",
           },
           {
-            index: '/solution',
-            title: '内容管理',
+            index: "/solution",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-lx-peoplefill',
-        index: '5',
-        title: '关于我们',
+        icon: "el-icon-lx-peoplefill",
+        index: "5",
+        title: "关于我们",
         subs: [
           {
-            index: '/aboutType',
-            title: '类别管理',
+            index: "/aboutType",
+            title: "类别管理",
           },
           {
-            index: '/about',
-            title: '内容管理',
+            index: "/about",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-lx-service',
-        index: '6',
-        title: '联系我们',
+        icon: "el-icon-lx-service",
+        index: "6",
+        title: "联系我们",
         subs: [
           {
-            index: '/contactType',
-            title: '类别管理',
+            index: "/contactType",
+            title: "类别管理",
           },
           {
-            index: '/contact',
-            title: '内容管理',
+            index: "/contact",
+            title: "内容管理",
           },
         ],
       },
       {
-        icon: 'el-icon-lx-calendar',
-        index: '3',
-        title: '表单相关',
+        icon: "el-icon-lx-home",
+        index: "7",
+        title: "首页数据",
         subs: [
           {
-            index: '/form',
-            title: '基本表单',
+            index: "/homeDataType",
+            title: "类别管理",
           },
           {
-            index: '/upload',
-            title: '文件上传',
-          },
-          {
-            index: '4',
-            title: '三级菜单',
-            subs: [
-              {
-                index: '/editor',
-                title: '富文本编辑器',
-              },
-            ],
+            index: "/homeData",
+            title: "内容管理",
           },
         ],
       },
-      {
-        icon: 'el-icon-lx-cascades',
-        index: '/table',
-        title: '基础表格',
-      },
-      {
-        icon: 'el-icon-lx-copy',
-        index: '/tabs',
-        title: 'tab选项卡',
-      },
-      {
-        icon: 'el-icon-lx-emoji',
-        index: '/icon',
-        title: '自定义图标',
-      },
-      {
-        icon: 'el-icon-pie-chart',
-        index: '/charts',
-        title: 'schart图表',
-      },
-      {
-        icon: 'el-icon-lx-global',
-        index: '/i18n',
-        title: '国际化功能',
-      },
-      {
-        icon: 'el-icon-lx-warn',
-        index: '7',
-        title: '错误处理',
-        subs: [
-          {
-            index: '/permission',
-            title: '权限测试',
-          },
-          {
-            index: '/404',
-            title: '404页面',
-          },
-        ],
-      },
+      // {
+      //   icon: 'el-icon-lx-calendar',
+      //   index: '3',
+      //   title: '表单相关',
+      //   subs: [
+      //     {
+      //       index: '/form',
+      //       title: '基本表单',
+      //     },
+      //     {
+      //       index: '/upload',
+      //       title: '文件上传',
+      //     },
+      //     {
+      //       index: '4',
+      //       title: '三级菜单',
+      //       subs: [
+      //         {
+      //           index: '/editor',
+      //           title: '富文本编辑器',
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
+      // {
+      //   icon: 'el-icon-lx-cascades',
+      //   index: '/table',
+      //   title: '基础表格',
+      // },
+      // {
+      //   icon: 'el-icon-lx-copy',
+      //   index: '/tabs',
+      //   title: 'tab选项卡',
+      // },
+      // {
+      //   icon: 'el-icon-lx-emoji',
+      //   index: '/icon',
+      //   title: '自定义图标',
+      // },
+      // {
+      //   icon: 'el-icon-pie-chart',
+      //   index: '/charts',
+      //   title: 'schart图表',
+      // },
+      // {
+      //   icon: 'el-icon-lx-global',
+      //   index: '/i18n',
+      //   title: '国际化功能',
+      // },
+      // {
+      //   icon: 'el-icon-lx-warn',
+      //   index: '7',
+      //   title: '错误处理',
+      //   subs: [
+      //     {
+      //       index: '/permission',
+      //       title: '权限测试',
+      //     },
+      //     {
+      //       index: '/404',
+      //       title: '404页面',
+      //     },
+      //   ],
+      // },
     ];
 
     const route = useRoute();
@@ -250,4 +265,3 @@ export default {
   height: 100%;
 }
 </style>
-
