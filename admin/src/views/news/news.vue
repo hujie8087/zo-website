@@ -191,16 +191,16 @@
 </template>
 
 <script>
-import WangEditor from "wangeditor";
-import { ref, reactive } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { fetchData } from "../../api/index";
+import WangEditor from 'wangeditor';
+import { ref, reactive } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { fetchData } from '../../api/index';
 export default {
-  name: "productsType",
+  name: 'productsType',
   setup() {
     const query = reactive({
-      type: "",
-      name: "",
+      type_id: '',
+      news_title: '',
       pageIndex: 1,
       pageSize: 10,
     });
@@ -208,8 +208,8 @@ export default {
     const pageTotal = ref(0);
     const ruleForm = ref();
     const formRules = reactive({
-      typeId: [{ required: true, message: "请选择产品类别", trigger: "blur" }],
-      name: [{ required: true, message: "请输入产品名称", trigger: "blur" }],
+      typeId: [{ required: true, message: '请选择产品类别', trigger: 'blur' }],
+      name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
     });
     // 获取表格数据
     const getData = () => {
@@ -234,11 +234,11 @@ export default {
     // 删除操作
     const handleDelete = (index) => {
       // 二次确认删除
-      ElMessageBox.confirm("确定要删除吗？", "提示", {
-        type: "warning",
+      ElMessageBox.confirm('确定要删除吗？', '提示', {
+        type: 'warning',
       })
         .then(() => {
-          ElMessage.success("删除成功");
+          ElMessage.success('删除成功');
           tableData.value.splice(index, 1);
         })
         .catch(() => {});
@@ -249,18 +249,18 @@ export default {
     const editor = ref(null);
     let instance;
     const content = reactive({
-      html: "",
-      text: "",
+      html: '',
+      text: '',
     });
     let form = reactive({
-      typeId: "",
-      name: "",
-      content: "",
-      isShow: "",
-      isRelevant: "",
-      order: "",
-      maxImg: "",
-      minImg: "",
+      typeId: '',
+      name: '',
+      content: '',
+      isShow: '',
+      isRelevant: '',
+      order: '',
+      maxImg: '',
+      minImg: '',
     });
     let idx = -1;
     const handleEdit = (index, row) => {
@@ -275,14 +275,14 @@ export default {
         instance = new WangEditor(editor.value);
         instance.config.zIndex = 1;
         instance.config.uploadImgServer =
-          "https://www.fastmock.site/mock/c1e5a5d1eaff7d422ff79301d9adc355/api/upload-img";
+          'https://www.fastmock.site/mock/c1e5a5d1eaff7d422ff79301d9adc355/api/upload-img';
         instance.config.uploadImgAccept = [
-          "jpg",
-          "jpeg",
-          "png",
-          "gif",
-          "bmp",
-          "webp",
+          'jpg',
+          'jpeg',
+          'png',
+          'gif',
+          'bmp',
+          'webp',
         ];
         instance.create();
         instance.txt.html(form.content);

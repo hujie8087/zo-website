@@ -1,3 +1,7 @@
 {
-  "extends": "eslint-config-egg"
+  "extends": "eslint-config-egg",
+  "rules": {
+    　　// no space before function name
+    　"space-before-function-paren": 0  //
+    }
 }
