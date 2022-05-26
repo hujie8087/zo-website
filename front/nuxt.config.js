@@ -57,7 +57,8 @@ export default {
     },
     proxy: {
         '/api': {
-            target: 'https://www.fastmock.site/mock/c1e5a5d1eaff7d422ff79301d9adc355/api',
+            target: 'http://127.0.0.1:7001',
+            // target: 'https://www.fastmock.site/mock/c1e5a5d1eaff7d422ff79301d9adc355/api',
             secrue: false,
             pathRewrite: {
                 '^/api': '',

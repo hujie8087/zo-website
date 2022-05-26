@@ -1,35 +1,37 @@
 <template>
   <div class="about">
-    <default-banner
-      :img-url="bannerOptions.bannerImg"
-      :title="bannerOptions.title"
-    />
+    <default-banner :img-url="aboutInfo.bannerImg" :title="aboutInfo.title" />
     <div class="container">
       <el-row class="company">
         <el-col :span="12">
           <div class="name">
-            <span>{{ aboutInfo.name }}</span>
+            <span>{{ aboutInfo.title }}</span>
           </div>
           <div class="content">
-            <span v-html="aboutInfo.content"></span>
+            <h2>{{ aboutInfo.subtitle }}</h2>
+            <h3>{{ aboutInfo.description }}</h3>
+            <div v-html="aboutInfo.content"></div>
           </div>
         </el-col>
         <el-col :span="12">
           <div class="show-img">
-            <img :src="aboutInfo.maxImg" alt="" />
+            <div
+              class="show-box"
+              :style="
+                'background: url(' +
+                aboutInfo.aboutMaxImg +
+                ') no-repeat center;'
+              "
+            ></div>
           </div>
         </el-col>
       </el-row>
     </div>
-    <section
-      :style="
-        'background:url(' + aboutInfo.solution.bgImgUrl + ') no-repeat center'
-      "
-    >
+    <section class="solution-main">
       <div class="solution">
         <div class="title">
-          <span>{{ aboutInfo.solution.title1 }}</span>
-          <span style="color: #fdc900">{{ aboutInfo.solution.title2 }}</span>
+          <span>Our one and only priority is the</span>
+          <span style="color: #fdc900">customer satisfaction</span>
         </div>
         <div class="link">
           <nuxt-link to="/solutions">MORE</nuxt-link>
@@ -40,28 +42,24 @@
       <el-row class="list">
         <el-col :span="6">
           <div class="head">
-            <div class="name">
-              {{ aboutInfo.solution.listHead }}
-            </div>
+            <div class="name">Our Business Divisions</div>
             <div>
-              {{ aboutInfo.solution.listContent }}
+              Membzone is comprised of four divisions, each of which has
+              in-depth expertise in specific chemistries and technologies and
+              leading positions in the markets they serve.
             </div>
           </div>
         </el-col>
-        <el-col
-          v-for="item in aboutInfo.solution.list"
-          :key="item.id"
-          :span="6"
-        >
+        <el-col v-for="item in classifyList" :key="item._id" :span="6">
           <div class="item">
-            <img :src="item.minImg" alt="" />
+            <img :src="'http://www.membzone.com/' + item.classify_img" alt="" />
             <div class="name">
-              {{ item.name }}
+              {{ item.classify_name }}
             </div>
             <div class="content">
-              {{ item.content }}
+              {{ filterHtml(item.classify_intro) }}
             </div>
-            <nuxt-link :to="'/solutions/' + item.id">MORE</nuxt-link>
+            <nuxt-link to="/">MORE</nuxt-link>
           </div>
         </el-col>
       </el-row>
@@ -70,12 +68,12 @@
       <div class="container">
         <el-row type="flex" :gutter="30">
           <el-col
-            v-for="item in aboutInfo.honors"
+            v-for="item in classifyList"
             :key="item.id"
             :span="6"
             class="item"
           >
-            <img :src="item.maxImg" alt="" />
+            <img :src="'http://www.membzone.com/' + item.classify_img" alt="" />
           </el-col>
         </el-row>
       </div>
@@ -90,13 +88,8 @@ export default {
   transition: 'fade',
   data() {
     return {
-      bannerOptions: {
-        bannerImg: require('../../static/images/banner/news-banner.jpg'),
-        title: 'ABOUT US',
-      },
-      aboutInfo: {
-        solution: {},
-      },
+      aboutInfo: {},
+      classifyList: [],
     }
   },
   created() {
@@ -105,14 +98,19 @@ export default {
   methods: {
     getAboutInfo() {
       this.$http
-        .get('/getAboutDetail')
+        .get('/about')
         .then((result) => {
-          this.aboutInfo = result.data
+          const { aboutInfo, classifyList } = result.data
+          this.aboutInfo = aboutInfo
+          this.classifyList = classifyList
           this.initStatus = true
         })
         .catch((err) => {
           this.$message.error(err)
         })
+    },
+    filterHtml(val) {
+      return val.replace(/<.*?>/g, '')
     },
   },
 }
@@ -123,13 +121,13 @@ export default {
   margin: 70px 0;
   .name {
     padding-bottom: 20px;
-    width: 140px;
     color: #051829;
     font-size: 26px;
     font-weight: bold;
     line-height: 30px;
     border-bottom: 3px solid #fdc900;
     margin-bottom: 20px;
+    display: inline-block;
   }
   .content {
     height: auto;
@@ -137,6 +135,10 @@ export default {
     font-size: 14px;
     color: #666;
     padding-right: 40px;
+    h2,
+    h3 {
+      margin-bottom: 10px;
+    }
   }
   .show-img {
     border: 2px solid #fdc900;
@@ -144,12 +146,18 @@ export default {
     height: 466px;
     position: relative;
     float: right;
-    img {
+    .show-box {
       position: absolute;
       right: 50px;
       top: 60px;
+      width: 526px;
+      height: 350px;
+      overflow: hidden;
     }
   }
+}
+.solution-main {
+  background: url(../../static/images/background/about-bg.jpg) no-repeat center;
 }
 .solution {
   width: 1200px;
@@ -199,6 +207,7 @@ export default {
   }
   .item {
     padding: 0 20px;
+    margin-bottom: 40px;
     img {
       display: block;
       margin: 0 auto 20px;

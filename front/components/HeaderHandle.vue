@@ -62,37 +62,37 @@ export default {
         {
           key: 'index',
           path: '/',
-          title: '首页',
+          title: 'HOME',
+        },
+        {
+          key: 'Markets',
+          path: '/markets',
+          title: 'Markets',
         },
         {
           key: 'Products',
           path: '/products',
-          title: '产品中心',
+          title: 'Products',
+        },
+        {
+          key: 'Sustainability',
+          path: '/sustainability',
+          title: 'Sustainability',
         },
         {
           key: 'News',
           path: '/news',
-          title: '新闻中心',
-        },
-        {
-          key: 'Case',
-          path: '/case',
-          title: '项目案例',
-        },
-        {
-          key: 'Solutions',
-          path: '/solutions',
-          title: '解决方案',
+          title: 'News',
         },
         {
           key: 'About',
           path: '/about',
-          title: '关于我们',
+          title: 'About',
         },
         {
           key: 'Contact',
           path: '/contact',
-          title: '联系我们',
+          title: 'Contact',
         },
       ],
     }

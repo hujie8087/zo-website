@@ -66,34 +66,34 @@ export default {
       email: 'xxx@qq.com',
       menus: [
         {
+          key: 'Markets',
+          path: '/markets',
+          title: 'Markets',
+        },
+        {
           key: 'Products',
-          path: '/Products',
-          title: '产品中心',
+          path: '/products',
+          title: 'Products',
         },
         {
           key: 'News',
-          path: '/News',
-          title: '新闻中心',
+          path: '/news',
+          title: 'News',
         },
         {
-          key: 'Case',
-          path: '/Case',
-          title: '项目案例',
-        },
-        {
-          key: 'Solutions',
-          path: '/Solutions',
-          title: '解决方案',
+          key: 'Sustainability',
+          path: '/sustainability',
+          title: 'Sustainability',
         },
         {
           key: 'About',
           path: '/About',
-          title: '关于我们',
+          title: 'About',
         },
         {
           key: 'Contact',
           path: '/Contact',
-          title: '联系我们',
+          title: 'Contact',
         },
       ],
       CopyRight: 'Copyright © 2022 membzone All Rights Reserved ',

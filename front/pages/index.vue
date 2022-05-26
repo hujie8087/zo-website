@@ -255,6 +255,12 @@
         </el-row>
       </div>
     </section>
+    <section class="links container">
+      <span>Links:</span>
+      <nuxt-link v-for="item in links" :key="item._id" :to="item.link_url">{{
+        item.link_name
+      }}</nuxt-link>
+    </section>
   </div>
 </template>
 
@@ -304,6 +310,7 @@ export default {
         content: '',
         email: '',
       },
+      links: [],
       rules: {
         name: [
           {
@@ -413,6 +420,14 @@ export default {
         .get('/getHomeNews')
         .then((result) => {
           this.newsList = result.data
+        })
+        .catch((err) => {
+          this.$message.error(err)
+        })
+      this.$http
+        .get('/links')
+        .then((result) => {
+          this.links = result.data
         })
         .catch((err) => {
           this.$message.error(err)
@@ -766,6 +781,19 @@ export default {
     word-break: normal;
     height: 50px;
     overflow: hidden;
+  }
+}
+.links {
+  padding: 30px 0;
+  line-height: 25px;
+  font-size: 16px;
+  color: #666;
+  a {
+    color: #666;
+    margin-left: 20px;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 </style>
