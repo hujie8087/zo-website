@@ -74,4 +74,11 @@ export default {
     }
   }
 }
+.height-auto {
+  height: auto;
+  img {
+    height: auto;
+    min-height: auto;
+  }
+}
 </style>

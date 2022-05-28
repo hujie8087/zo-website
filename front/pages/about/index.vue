@@ -1,6 +1,9 @@
 <template>
   <div class="about">
-    <default-banner :img-url="aboutInfo.bannerImg" :title="aboutInfo.title" />
+    <default-banner
+      :img-url="bannerOptions.banner_img"
+      :title="bannerOptions.banner_title"
+    />
     <div class="container">
       <el-row class="company">
         <el-col :span="12">
@@ -89,11 +92,23 @@ export default {
   data() {
     return {
       aboutInfo: {},
+      bannerOptions: {},
       classifyList: [],
     }
   },
   created() {
     this.getAboutInfo()
+    this.$http
+      .get('/banner?banner_id=4')
+      .then((result) => {
+        this.bannerOptions = {
+          banner_img: result.data.banner_url + result.data.banner_img,
+          banner_title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
   },
   methods: {
     getAboutInfo() {

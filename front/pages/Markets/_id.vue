@@ -2,54 +2,60 @@
   <transition name="Fade" mode="out-in">
     <div class="case-detail">
       <default-banner
-        :img-url="bannerOptions.bannerImg"
-        :title="bannerOptions.title"
+        :img-url="'http://www.membzone.com/' + detail.max_img"
+        :title="detail.name"
+        cus-class="height-auto"
       />
       <div class="container">
         <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/case">Cews</a></el-breadcrumb-item>
+          <el-breadcrumb-item
+            ><a href="/markets">Markets</a></el-breadcrumb-item
+          >
         </el-breadcrumb>
         <div class="title">
-          {{ detail.title }}
+          {{ detail.name }}
         </div>
         <div class="date">
-          {{ detail.createDate }}
+          {{ detail.create_date ? detail.create_date : setFormat(detail.date) }}
         </div>
         <div class="content">
-          {{ detail.content }}
+          <div v-html="detail.content"></div>
         </div>
         <div class="prev-next">
-          <nuxt-link :to="prevNext.prev ? '/case/' + prevNext.prev.id : ''">
-            Prev:{{ prevNext.prev ? prevNext.prev.title : 'none' }}
+          <nuxt-link v-if="prevNext.prev" :to="'/markets/' + prevNext.prev._id">
+            Prev:{{ prevNext.prev.name }}
           </nuxt-link>
-          <nuxt-link :to="prevNext.next ? '/case/' + prevNext.next.id : ''">
-            Next:{{ prevNext.next ? prevNext.next.title : 'none' }}
+          <span v-else> Prev:none </span>
+          <nuxt-link v-if="prevNext.next" :to="'/markets/' + prevNext.next._id">
+            Next:{{ prevNext.next.name }}
           </nuxt-link>
         </div>
         <div class="relevant">
           <div class="relevant-head"><span>Relevant Case</span></div>
           <el-row class="relevant-list">
             <el-col
-              v-for="item in caseRelative"
-              :key="item.id"
+              v-for="item in marketsRelative"
+              :key="item._id"
               :span="12"
               class="relevant-item"
             >
               <el-row>
                 <el-col :span="4" class="relevant-date">
-                  <span> {{ setDate(item.date) }}</span>
+                  <span> {{ setDate(item.date * 1000) }}</span>
                   <span class="relevant-year">
-                    {{ setDate(item.date, true) }}</span
+                    {{ setDate(item.date * 1000, true) }}</span
                   >
                 </el-col>
                 <el-col :span="20">
                   <div class="relevant-title">
-                    <nuxt-link :to="'/case/' + item.id">{{
-                      item.title
+                    <nuxt-link :to="'/markets/' + item._id">{{
+                      item.name
                     }}</nuxt-link>
                   </div>
-                  <div class="relevant-content">{{ item.content }}</div>
+                  <div class="relevant-content">
+                    {{ filterHtml(item.content) }}
+                  </div>
                 </el-col>
               </el-row>
             </el-col>
@@ -67,35 +73,31 @@ export default {
   transition: 'fade',
   data() {
     return {
-      bannerOptions: {
-        bannerImg: require('../../static/images/banner/news-banner.jpg'),
-        title: 'NEWS CENTER',
-      },
+      bannerOptions: {},
+      id: '',
       detail: {
         title: '',
         createDate: '',
         content: '',
       },
       prevNext: {},
-      caseRelative: [],
+      marketsRelative: [],
     }
   },
   created() {
-    console.log(this.$route.params)
+    this.id = this.$route.params.id
     this.getDetail()
   },
   methods: {
     getDetail() {
-      this.$http.get(`/newsDetail`).then((result) => {
+      this.$http.get(`/markets/${this.id}`).then((result) => {
         this.detail = result.data
       })
-      this.$http
-        .get(`/newsPrevNext`, { id: this.$route.params.id })
-        .then((result) => {
-          this.prevNext = result.data
-        })
-      this.$http.get('/newsRelative').then((res) => {
-        this.caseRelative = res.data
+      this.$http.get(`/markets/prevNext/${this.id}`).then((result) => {
+        this.prevNext = result.data
+      })
+      this.$http.get(`/markets/relative/${this.id}`).then((res) => {
+        this.marketsRelative = res.data
       })
     },
     setDate(val, year) {
@@ -104,6 +106,12 @@ export default {
       } else {
         return moment(val).format('MM/DD')
       }
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
+    },
+    setFormat(val) {
+      return moment(val * 1000).format('yyyy-MM-DD HH:mm:ss')
     },
   },
 }
@@ -129,6 +137,9 @@ export default {
     font-size: 14px;
     color: #666;
     margin: 30px 0;
+    /deep/ * {
+      color: #333 !important;
+    }
   }
   .prev-next {
     height: 50px;

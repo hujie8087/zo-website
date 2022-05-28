@@ -3,6 +3,7 @@
     <default-banner
       :img-url="bannerOptions.bannerImg"
       :title="bannerOptions.title"
+      cus-class="height-auto"
     />
     <div class="container">
       <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
@@ -11,35 +12,61 @@
           ><a href="/products">Products</a></el-breadcrumb-item
         >
       </el-breadcrumb>
-      <div class="category-navigation">
-        <nuxt-link
-          v-for="productType in productTypeList"
-          :key="productType.id"
-          :to="'products?type=' + productType.id"
-        >
-          {{ productType.name }}
-        </nuxt-link>
-      </div>
 
+      <el-form :inline="true" :model="formInline" class="form-inline">
+        <el-form-item label="Product name">
+          <el-input
+            v-model="formInline.name"
+            placeholder="Enter product name and view results below"
+            style="width: 300px"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="Market">
+          <el-select v-model="formInline.market">
+            <el-option label="All" value=""></el-option>
+            <el-option
+              v-for="item in marketsTypeList"
+              :key="item._id"
+              :label="item.title"
+              :value="item.type_id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Division">
+          <el-select v-model="formInline.division">
+            <el-option label="All" value=""></el-option>
+            <el-option
+              v-for="item in divisionList"
+              :key="item._id"
+              :label="item.name"
+              :value="item.division_id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">Search</el-button>
+        </el-form-item>
+      </el-form>
       <div class="product">
-        <el-row :gutter="50">
-          <el-col
-            v-for="item in products"
-            :key="item.id"
-            :span="8"
-            class="product-item"
-          >
-            <nuxt-link :to="'/products/' + item.id">
-              <img class="product-maxImg" :src="item.maxImg" />
-              <div class="product-content">
-                <img class="product-minImg" :src="item.minImg" />
-                <span class="product-name">
-                  {{ item.name }}
-                </span>
-              </div>
-            </nuxt-link>
-          </el-col>
-        </el-row>
+        <el-table :data="products" style="width: 100%">
+          <el-table-column prop="goods_name" label="Products Name">
+            <template slot-scope="scope">
+              <nuxt-link :to="'/products/' + scope.row._id">
+                {{ scope.row.goods_name }}
+              </nuxt-link>
+            </template>
+          </el-table-column>
+          <el-table-column prop="classify_id" label="Market(s)">
+            <template slot-scope="scope">
+              {{ setClassify(scope.row.classify_id) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="division_id" label="Division">
+            <template slot-scope="scope">
+              {{ setDivision(scope.row.division_id) }}
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
       <el-pagination
         class="pagination"
@@ -65,41 +92,88 @@ export default {
         bannerImg: require('../../static/images/banner/news-banner.jpg'),
         title: 'PRODUCTS CENTER',
       },
-      typeId: '',
-      productTypeList: [
-        {
-          name: '产品类型1',
-          id: 100,
-        },
-        {
-          name: '产品类型2',
-          id: 101,
-        },
-      ],
       products: [],
       pageParams: {
         currentPage: 1,
-        pageSize: 6,
+        pageSize: 15,
       },
+      marketsTypeList: [],
+      divisionList: [],
       total: 0,
+      formInline: {
+        name: '',
+        market: '',
+        division: '',
+      },
     }
   },
   created() {
-    this.typeId = this.$route.query.type ? this.$route.query.type : ''
+    this.$http
+      .get('/banner?banner_id=6')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.$http
+      .get('/marketsType')
+      .then((result) => {
+        this.marketsTypeList = result.data
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.$http
+      .get('/division')
+      .then((result) => {
+        this.divisionList = result.data
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
     this.getDate()
   },
   methods: {
     getDate() {
-      this.$http.get('/getProducts').then((result) => {
-        this.products = result.data
+      const params = {
+        pageSize: this.pageParams.pageSize,
+        pageIndex: this.pageParams.currentPage,
+        ...this.formInline,
+      }
+      this.$http.get('/products', { params }).then((result) => {
+        this.products = result.data.list
         this.initStatus = true
-        this.total = result.total
+        this.total = result.data.total
       })
     },
-
     handleCurrentChange(val) {
       this.pageParams.currentPage = val
       this.getDate()
+    },
+    onSubmit() {
+      this.getDate()
+    },
+    setClassify(val) {
+      const market = this.marketsTypeList.filter((item) => item.type_id === val)
+      if (market.length) {
+        return market[0].title
+      } else {
+        return 'Products'
+      }
+    },
+    setDivision(val) {
+      const market = this.divisionList.filter(
+        (item) => item.division_id === val
+      )
+      if (market.length) {
+        return market[0].name
+      } else {
+        return ''
+      }
     },
   },
 }
@@ -134,7 +208,7 @@ export default {
   }
 }
 .product {
-  margin: 60px 0 40px;
+  margin: 20px 0 40px;
   &-item {
     position: relative;
     margin-bottom: 30px;

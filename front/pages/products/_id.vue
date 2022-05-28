@@ -3,6 +3,7 @@
     <default-banner
       :img-url="bannerOptions.bannerImg"
       :title="bannerOptions.title"
+      cus-class="height-auto"
     />
     <div class="container">
       <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
@@ -11,45 +12,24 @@
           ><a href="/products">Products</a></el-breadcrumb-item
         >
       </el-breadcrumb>
-      <el-row>
-        <el-col :span="6">
-          <div class="category-navigation">
-            <nuxt-link
-              v-for="productType in productTypeList"
-              :key="productType.id"
-              :to="'../products?type=' + productType.id"
-            >
-              {{ productType.name }}
-            </nuxt-link>
-          </div>
-          <div class="contact-wrap">
-            <div class="title">联系我们</div>
-            <p>4000 662 228</p>
-            <p>xxxx@xxxx.com</p>
-            <p>广东省深圳市宝安区西乡街道航城大道</p>
-          </div>
-        </el-col>
-        <el-col :span="17" :offset="1">
-          <div class="detail">
-            <img :src="detail.maxImg" alt="" />
-            <div class="detail-name">
-              {{ detail.name }}
-            </div>
-            <div class="detail-content">
-              <div v-html="detail.content"></div>
-            </div>
-            <div class="detail-contact">
-              <nuxt-link to="/contact">Contact Us</nuxt-link>
-            </div>
-          </div>
-        </el-col>
-      </el-row>
+      <div class="detail">
+        <div class="detail-name">
+          {{ detail.goods_name }}
+        </div>
+        <div class="detail-content">
+          <div v-html="detail.goods_content"></div>
+        </div>
+        <div class="detail-contact">
+          <nuxt-link to="/contact">Contact Us</nuxt-link>
+        </div>
+      </div>
       <div class="prev-next">
-        <nuxt-link :to="prevNext.prev ? '/products/' + prevNext.prev.id : ''">
-          Prev:{{ prevNext.prev ? prevNext.prev.title : 'none' }}
+        <nuxt-link v-if="prevNext.prev" :to="'/products/' + prevNext.prev._id">
+          Prev:{{ prevNext.prev.goods_name }}
         </nuxt-link>
-        <nuxt-link :to="prevNext.next ? '/products/' + prevNext.next.id : ''">
-          Next:{{ prevNext.next ? prevNext.next.title : 'none' }}
+        <span v-else> Prev:none </span>
+        <nuxt-link v-if="prevNext.next" :to="'/products/' + prevNext.next._id">
+          Next:{{ prevNext.next.goods_name }}
         </nuxt-link>
       </div>
       <div class="relevant">
@@ -62,18 +42,15 @@
             class="relevant-item"
           >
             <el-row>
-              <el-col :span="4" class="relevant-img">
-                <nuxt-link :to="'/products/' + item.id">
-                  <img :src="item.maxImg" alt="" />
-                </nuxt-link>
-              </el-col>
-              <el-col :span="18" :offset="1">
+              <el-col :span="18">
                 <div class="relevant-name">
                   <nuxt-link :to="'/products/' + item.id">{{
-                    item.name
+                    item.goods_name
                   }}</nuxt-link>
                 </div>
-                <div class="relevant-content">{{ item.content }}</div>
+                <div class="relevant-content">
+                  {{ filterHtml(item.goods_content) }}
+                </div>
               </el-col>
             </el-row>
           </el-col>
@@ -89,21 +66,7 @@ export default {
   components: { DefaultBanner },
   data() {
     return {
-      bannerOptions: {
-        bannerImg: require('../../static/images/banner/news-banner.jpg'),
-        title: 'PRODUCTS CENTER',
-      },
-      typeId: '',
-      productTypeList: [
-        {
-          name: '产品类型1',
-          id: 100,
-        },
-        {
-          name: '产品类型2',
-          id: 101,
-        },
-      ],
+      bannerOptions: {},
       id: '',
       detail: {},
       prevNext: {},
@@ -112,95 +75,50 @@ export default {
   },
   created() {
     this.id = this.$route.params.id
+    this.$http
+      .get('/banner?banner_id=6')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
     this.getDetail()
   },
   methods: {
     getDetail() {
+      this.$http.get(`/products/${this.id}`).then((result) => {
+        this.detail = result.data
+      })
       this.$http
-        .get(`/getProductDetail`, {
-          params: { id: this.id },
-        })
-        .then((result) => {
-          this.detail = result.data
-        })
-
-      this.$http
-        .get(`/newsPrevNext`, { id: this.$route.params.id })
+        .get(`/products/prevNext/${this.id}`, { id: this.$route.params.id })
         .then((result) => {
           this.prevNext = result.data
         })
       this.$http
-        .get(`/productsRelative`, { id: this.$route.params.id })
+        .get(`/products/relative/${this.id}`, { id: this.$route.params.id })
         .then((result) => {
           this.productsRelative = result.data
         })
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.category-navigation {
-  width: 100%;
-  line-height: 40px;
-  font-size: 16px;
-  margin: 20px 0 40px;
-  a {
-    display: block;
-    width: 100%;
-    height: 40px;
-    text-align: center;
-    color: #333333;
-    background-color: #fdc900;
-    margin-right: 30px;
-    border-radius: 5px;
-    text-decoration: none;
-    margin-bottom: 20px;
-    &:hover {
-      color: #fff;
-      background-color: #333333;
-    }
-  }
-  .nuxt-link-exact-active {
-    background-color: #333333;
-    color: #ffffff;
-  }
-}
-.contact-wrap {
-  margin-top: 30px;
-  border: 3px solid #e9e9e9;
-  padding: 20px;
-  font-size: 14px;
-  color: #666;
-  .title {
-    font-size: 18px;
-    color: #333;
-    line-height: 40px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  p {
-    background: url('../../static/images/tel.png') no-repeat left center;
-    padding-left: 30px;
-    background-size: 20px;
-    margin-bottom: 15px;
-    &:nth-child(2) {
-      background-image: url('../../static/images/email.png');
-    }
-    &:nth-child(3) {
-      background-image: url('../../static/images/address.png');
-    }
-  }
-}
 .detail {
-  img {
-    margin-bottom: 30px;
-  }
+  margin: 30px 0;
   &-name {
     color: #333333;
-    font-size: 16px;
+    font-size: 26px;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
   &-content {
     line-height: 25px;
@@ -233,6 +151,9 @@ export default {
   line-height: 50px;
   font-size: 14px;
   margin-top: 50px;
+  span {
+    margin-right: 30px;
+  }
   a {
     color: #333;
     margin-right: 30px;

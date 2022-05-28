@@ -11,20 +11,21 @@
           <el-breadcrumb-item><a href="/news">News</a></el-breadcrumb-item>
         </el-breadcrumb>
         <div class="title">
-          {{ detail.title }}
+          {{ detail.news_title }}
         </div>
         <div class="date">
-          {{ detail.createDate }}
+          {{ detail.create_date ? detail.create_date : setFormat(detail.date) }}
         </div>
         <div class="content">
-          {{ detail.content }}
+          <div v-html="detail.news_content"></div>
         </div>
         <div class="prev-next">
-          <nuxt-link :to="prevNext.prev ? '/news/' + prevNext.prev.id : ''">
-            Prev:{{ prevNext.prev ? prevNext.prev.title : 'none' }}
+          <nuxt-link v-if="prevNext.prev" :to="'/news/' + prevNext.prev._id">
+            Prev:{{ prevNext.prev.news_title }}
           </nuxt-link>
-          <nuxt-link :to="prevNext.next ? '/news/' + prevNext.next.id : ''">
-            Next:{{ prevNext.next ? prevNext.next.title : 'none' }}
+          <span v-else> Prev:none </span>
+          <nuxt-link v-if="prevNext.next" :to="'/news/' + prevNext.next._id">
+            Next:{{ prevNext.next.news_title }}
           </nuxt-link>
         </div>
         <div class="relevant">
@@ -38,18 +39,20 @@
             >
               <el-row>
                 <el-col :span="4" class="relevant-date">
-                  <span> {{ setDate(item.date) }}</span>
+                  <span> {{ setDate(item.create_date) }}</span>
                   <span class="relevant-year">
-                    {{ setDate(item.date, true) }}</span
+                    {{ setDate(item.create_date, true) }}</span
                   >
                 </el-col>
                 <el-col :span="20">
                   <div class="relevant-title">
-                    <nuxt-link :to="'/news/' + item.id">{{
-                      item.title
+                    <nuxt-link :to="'/news/' + item._id">{{
+                      item.news_title
                     }}</nuxt-link>
                   </div>
-                  <div class="relevant-content">{{ item.content }}</div>
+                  <div class="relevant-content">
+                    {{ filterHtml(item.news_content) }}
+                  </div>
                 </el-col>
               </el-row>
             </el-col>
@@ -71,6 +74,7 @@ export default {
         bannerImg: require('../../static/images/banner/news-banner.jpg'),
         title: 'NEWS CENTER',
       },
+      id: '',
       detail: {
         title: '',
         createDate: '',
@@ -81,20 +85,29 @@ export default {
     }
   },
   created() {
-    console.log(this.$route.params)
+    this.id = this.$route.params.id
+    this.$http
+      .get('/banner?banner_id=3')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
     this.getDetail()
   },
   methods: {
     getDetail() {
-      this.$http.get(`/newsDetail`).then((result) => {
+      this.$http.get(`/news/${this.id}`).then((result) => {
         this.detail = result.data
       })
-      this.$http
-        .get(`/newsPrevNext`, { id: this.$route.params.id })
-        .then((result) => {
-          this.prevNext = result.data
-        })
-      this.$http.get('/newsRelative').then((res) => {
+      this.$http.get(`/news/prevNext/${this.id}`).then((result) => {
+        this.prevNext = result.data
+      })
+      this.$http.get(`/news/relative/${this.id}`).then((res) => {
         this.newsRelative = res.data
       })
     },
@@ -104,6 +117,12 @@ export default {
       } else {
         return moment(val).format('MM/DD')
       }
+    },
+    setFormat(val) {
+      return moment(val * 1000).format('yyyy-MM-DD HH:mm:ss')
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
     },
   },
 }
@@ -134,6 +153,9 @@ export default {
     height: 50px;
     line-height: 50px;
     font-size: 14px;
+    span {
+      margin-right: 30px;
+    }
     a {
       color: #333;
       margin-right: 30px;
@@ -179,6 +201,10 @@ export default {
     color: #333333;
     font-size: 18px;
     line-height: 30px;
+    height: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     a {
       color: #333333;
       &:hover {

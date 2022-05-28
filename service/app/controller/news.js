@@ -3,16 +3,17 @@ const BaseController = require('./base');
 class ArticleController extends BaseController {
     async list() {
         const { ctx } = this;
-        const { pageSize, pageIndex, type_id, news_title } = ctx.query;
-        console.log((pageIndex - 1) * pageSize, +pageSize);
+        const { pageSize, pageIndex, typeId, title } = ctx.query;
+        console.log(ctx.query);
         let param = {};
-        if (type_id) {
-            param.type_id = type_id;
+        if (typeId) {
+            param.type_id = typeId;
         }
-        if (news_title) {
-            param.news_title = news_title;
+        if (title) {
+            param.news_title = title;
         }
         let ret = await ctx.model.News.find(param)
+            .sort({ date: -1 })
             .skip((pageIndex - 1) * pageSize)
             .limit(+pageSize);
         let count = await ctx.model.News.count(param);
@@ -21,7 +22,7 @@ class ArticleController extends BaseController {
     async detail() {
         const { ctx } = this;
         const { id } = ctx.params;
-        let info = await ctx.model.News.findOneAndUpdate({ _id: id }, { $inc: { views: 1 } }).populate('author');
+        let info = await ctx.model.News.findOne({ _id: id });
         this.success(info);
     }
     async create() {
@@ -47,6 +48,32 @@ class ArticleController extends BaseController {
         } else {
             this.error('创建失败');
         }
+    }
+    async getBanner() {
+        const { ctx } = this;
+        let info = await ctx.model.Banner.findOne({ banner_id: 3 });
+        this.success(info);
+    }
+    async relative() {
+        const { ctx } = this;
+        const { id } = ctx.params;
+        let info = await ctx.model.News.find({ _id: { $ne: id } }).limit(4);
+        this.success(info);
+    }
+    async prevNext() {
+        const { ctx } = this;
+        const { id } = ctx.params;
+        let list = await ctx.model.News.find().sort({ date: -1 });
+        let activeInfo = {};
+        for (let index = 0; index < list.length; index++) {
+            if (list[index]._id == id) {
+                activeInfo = {
+                    prev: index - 1 < 0 ? '' : list[index - 1],
+                    next: index + 1 < 0 ? '' : list[index + 1],
+                };
+            }
+        }
+        this.success(activeInfo);
     }
 }
 

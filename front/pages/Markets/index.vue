@@ -7,34 +7,43 @@
     <div class="container">
       <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
         <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-        <el-breadcrumb-item><a href="/case">Case</a></el-breadcrumb-item>
+        <el-breadcrumb-item><a href="/markets">Markets</a></el-breadcrumb-item>
       </el-breadcrumb>
       <div class="category-navigation">
-        <nuxt-link
-          v-for="caseType in caseTypeList"
-          :key="caseType.id"
-          :to="'case?type=' + caseType.id"
-        >
-          {{ caseType.name }}
-        </nuxt-link>
+        <el-radio-group v-model="typeId" @change="marketsTypeChange">
+          <el-radio-button label="">All markets</el-radio-button>
+          <el-radio-button
+            v-for="marketsType in marketsTypeList"
+            :key="marketsType._id"
+            :label="marketsType.type_id"
+            >{{ marketsType.title }}</el-radio-button
+          >
+        </el-radio-group>
       </div>
       <div class="case-list">
         <el-row :gutter="50">
           <el-col
-            v-for="item in caseList"
+            v-for="item in marketsList"
             :key="item.id"
             :span="8"
             class="item"
           >
             <div style="position: relative">
-              <img :src="item.imgUrl" alt="" srcset="" />
-              <nuxt-link :to="'/case/' + item.id">
+              <img
+                :src="'http://www.membzone.com/' + item.min_img"
+                alt=""
+                :onerror="errorImage"
+              />
+              <div class="name">
+                {{ item.name }}
+              </div>
+              <nuxt-link :to="'/markets/' + item._id">
                 <div class="main">
                   <div class="title">
-                    {{ item.title }}
+                    {{ item.name }}
                   </div>
                   <div class="content">
-                    {{ item.content }}
+                    {{ filterHtml(item.content) }}
                   </div>
                 </div>
               </nuxt-link>
@@ -67,35 +76,49 @@ export default {
         bannerImg: require('../../static/images/banner/news-banner.jpg'),
         title: 'CASES',
       },
-      caseTypeList: [
-        {
-          name: '经典案例',
-          id: 100,
-        },
-        {
-          name: '热门案例',
-          id: 101,
-        },
-      ],
-      caseList: [],
+      marketsTypeList: [],
+      marketsList: [],
       pageParams: {
         currentPage: 1,
         pageSize: 6,
       },
+      typeId: '',
       total: 0,
+      errorImage: require('../../static/images/banner/news-banner.jpg'),
     }
   },
   created() {
-    this.getNewsList()
+    this.$http
+      .get('/banner?banner_id=3')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.$http
+      .get('/marketsType')
+      .then((result) => {
+        this.marketsTypeList = result.data
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.getMarketsList()
   },
   methods: {
-    getNewsList() {
+    getMarketsList() {
       this.$http
-        .get('/getNewsList', { current: this.pageParams.currentPage })
+        .get(
+          `/markets?pageSize=${this.pageParams.pageSize}&pageIndex=${this.pageParams.currentPage}&typeId=${this.typeId}`
+        )
         .then((result) => {
-          this.caseList = result.data
+          this.marketsList = result.data.list
+          this.total = result.data.total
           this.initStatus = true
-          this.total = result.total
         })
         .catch((err) => {
           this.$message.error(err)
@@ -103,7 +126,15 @@ export default {
     },
     handleCurrentChange(val) {
       this.pageParams.currentPage = val
-      this.getNewsList()
+      this.getMarketsList()
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
+    },
+    marketsTypeChange(val) {
+      this.typeId = val
+      this.pageParams.currentPage = 1
+      this.getMarketsList()
     },
   },
 }
@@ -112,25 +143,30 @@ export default {
 <style lang="scss" scoped>
 .category-navigation {
   width: 100%;
-  height: 40px;
-  line-height: 40px;
   font-size: 16px;
   margin: 40px 0;
-  a {
+  overflow: hidden;
+  /deep/ .el-radio-button__inner {
     display: block;
-    width: 110px;
     height: 40px;
+    line-height: 40px;
+    padding: 0 10px;
     text-align: center;
     float: left;
     color: #333333;
     background-color: #fdc900;
-    margin-right: 30px;
+    border: 0;
+    margin: 0 20px 20px 0;
     border-radius: 5px;
     text-decoration: none;
     &:hover {
       color: #fff;
       background-color: #333333;
     }
+  }
+  .is-active /deep/ .el-radio-button__inner {
+    color: #fff;
+    background-color: #333333;
   }
   .nuxt-link-exact-active {
     background-color: #333333;
@@ -147,6 +183,18 @@ export default {
       width: 100%;
       height: auto;
     }
+    .name {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 40px;
+      line-height: 40px;
+      text-indent: 10px;
+      font-size: 16px;
+      color: #000;
+      background-color: #fdc900;
+    }
     .main {
       position: absolute;
       width: 100%;
@@ -160,9 +208,10 @@ export default {
       align-items: center;
       flex-direction: column;
       transition: 0.3s all;
+      background-color: rgba($color: #fdc900, $alpha: 0.8);
       .title {
         margin-bottom: 20px;
-        color: #333333;
+        color: #333;
         font-size: 16px;
         font-weight: bold;
       }
@@ -171,6 +220,7 @@ export default {
         font-size: 14px;
         color: #666;
         height: 75px;
+        overflow: hidden;
         max-width: 700px;
       }
     }

@@ -1,27 +1,31 @@
 'use strict';
 const BaseController = require('./base');
-class MarketsController extends BaseController {
+class ProductsController extends BaseController {
     async list() {
         const { ctx } = this;
-        const { pageSize, pageIndex, typeId, title } = ctx.query;
+        const { pageSize, pageIndex, name, market, division } = ctx.query;
+        var sreacKeyRegExp = new RegExp(name);
         let param = {};
-        if (typeId) {
-            param.type_id = typeId;
+        if (name) {
+            param.goods_name = sreacKeyRegExp;
         }
-        if (title) {
-            param.markets_title = title;
+        if (market) {
+            param.classify_id = market;
         }
-        let ret = await ctx.model.Markets.find(param)
+        if (division) {
+            param.division_id = division;
+        }
+        let ret = await ctx.model.Products.find(param)
             .sort({ date: -1 })
             .skip((pageIndex - 1) * pageSize)
             .limit(+pageSize);
-        let count = await ctx.model.Markets.count(param);
+        let count = await ctx.model.Products.count(param);
         this.success({ list: ret, total: count });
     }
     async detail() {
         const { ctx } = this;
         const { id } = ctx.params;
-        let info = await ctx.model.Markets.findOne({ _id: id });
+        let info = await ctx.model.Products.findOne({ _id: id });
         this.success(info);
     }
     async create() {
@@ -38,7 +42,7 @@ class MarketsController extends BaseController {
             article_html: content,
             author: userid,
         };
-        let ret = await ctx.model.Markets.create(obj);
+        let ret = await ctx.model.Products.create(obj);
         if (ret._id) {
             this.success({
                 id: ret._id,
@@ -50,19 +54,19 @@ class MarketsController extends BaseController {
     }
     async getBanner() {
         const { ctx } = this;
-        let info = await ctx.model.Banner.findOne({ banner_id: 3 });
+        let info = await ctx.model.Banner.findOne({ banner_id: 4 });
         this.success(info);
     }
     async relative() {
         const { ctx } = this;
         const { id } = ctx.params;
-        let info = await ctx.model.Markets.find({ _id: { $ne: id } }).limit(4);
+        let info = await ctx.model.Products.find({ _id: { $ne: id } }).limit(4);
         this.success(info);
     }
     async prevNext() {
         const { ctx } = this;
         const { id } = ctx.params;
-        let list = await ctx.model.Markets.find().sort({ date: -1 });
+        let list = await ctx.model.Products.find().sort({ date: -1 });
         let activeInfo = {};
         for (let index = 0; index < list.length; index++) {
             if (list[index]._id == id) {
@@ -76,4 +80,4 @@ class MarketsController extends BaseController {
     }
 }
 
-module.exports = MarketsController;
+module.exports = ProductsController;

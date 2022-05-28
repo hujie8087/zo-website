@@ -10,33 +10,36 @@
         <el-breadcrumb-item><a href="/news">News</a></el-breadcrumb-item>
       </el-breadcrumb>
       <div class="category-navigation">
-        <nuxt-link
-          v-for="newsType in newsTypeList"
-          :key="newsType.id"
-          :to="'news?type=' + newsType.id"
-        >
-          {{ newsType.name }}
-        </nuxt-link>
+        <el-radio-group v-model="typeId" @change="newsTypeChange">
+          <el-radio-button
+            v-for="newsType in newsTypeList"
+            :key="newsType._id"
+            :label="newsType.type_id"
+            >{{ newsType.title }}</el-radio-button
+          >
+        </el-radio-group>
       </div>
       <div class="news-list">
-        <div v-for="news in newsList" :key="news.id" class="item">
+        <div v-for="news in newsList" :key="news._id" class="item">
           <el-row>
             <el-col :span="16">
               <div class="title">
-                {{ news.title }}
+                <nuxt-link :to="'/news/' + news._id">{{
+                  news.news_title
+                }}</nuxt-link>
               </div>
               <div class="date">
-                {{ news.createData }}
+                {{ news.create_date }}
               </div>
               <div class="content">
-                {{ news.content }}
+                {{ filterHtml(news.news_content) }}
               </div>
               <div class="link">
-                <nuxt-link :to="'/news/' + news.id">MORE ></nuxt-link>
+                <nuxt-link :to="'/news/' + news._id">MORE ></nuxt-link>
               </div></el-col
             >
             <el-col :span="8">
-              <img :src="news.imgUrl" alt="" srcset="" />
+              <img :src="news.news_img" alt="" />
             </el-col>
           </el-row>
         </div>
@@ -56,27 +59,18 @@
 </template>
 
 <script>
+import { setFormat } from '../../utils/tools'
 import DefaultBanner from '../../components/DefaultBanner.vue'
+
 export default {
   components: { DefaultBanner },
   transition: 'fade',
   data() {
     return {
-      bannerOptions: {
-        bannerImg: require('../../static/images/banner/news-banner.jpg'),
-        title: 'NEWS CENTER',
-      },
-      newsTypeList: [
-        {
-          name: '公司新闻',
-          id: 100,
-        },
-        {
-          name: '行业新闻',
-          id: 101,
-        },
-      ],
+      bannerOptions: {},
+      newsTypeList: [],
       newsList: [],
+      typeId: '',
       pageParams: {
         currentPage: 1,
         pageSize: 6,
@@ -85,16 +79,41 @@ export default {
     }
   },
   created() {
+    this.$http
+      .get('/banner?banner_id=3')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.$http
+      .get('/newsType')
+      .then((result) => {
+        this.newsTypeList = result.data
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
+    this.typeId = this.$route.query.typeId ? this.$route.query.typeId : ''
     this.getNewsList()
   },
   methods: {
     getNewsList() {
       this.$http
-        .get('/getNewsList', { current: this.pageParams.currentPage })
+        .get(
+          `/news?pageSize=${this.pageParams.pageSize}&pageIndex=${this.pageParams.currentPage}&typeId=${this.typeId}`
+        )
         .then((result) => {
-          this.newsList = result.data
+          this.newsList = result.data.list.map((item) => {
+            item.date = setFormat(item.date)
+            return item
+          })
+          this.total = result.data.total
           this.initStatus = true
-          this.total = result.total
         })
         .catch((err) => {
           this.$message.error(err)
@@ -102,6 +121,14 @@ export default {
     },
     handleCurrentChange(val) {
       this.pageParams.currentPage = val
+      this.getNewsList()
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
+    },
+    newsTypeChange(val) {
+      this.typeId = val
+      this.pageParams.currentPage = 1
       this.getNewsList()
     },
   },
@@ -117,7 +144,8 @@ export default {
   margin: 40px 0;
   a {
     display: block;
-    width: 110px;
+    width: auto;
+    padding: 0 10px;
     height: 40px;
     text-align: center;
     float: left;
@@ -146,6 +174,12 @@ export default {
       color: #333333;
       font-size: 16px;
       font-weight: bold;
+      a {
+        color: #333;
+        &:hover {
+          color: #fdc900;
+        }
+      }
     }
     .date {
       margin-bottom: 10px;
@@ -159,8 +193,10 @@ export default {
       color: #666;
       height: 75px;
       max-width: 700px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    a {
+    .link a {
       font-size: 16px;
       color: #fdc900;
       font-weight: bold;
