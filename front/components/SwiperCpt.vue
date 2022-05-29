@@ -6,11 +6,11 @@
       :class="cusClass + ' swiperWrap swiperBox ' + swpName"
     >
       <div class="swiper-wrapper">
-        <div v-for="banner in list" :key="banner.src" class="swiper-slide">
-          <a v-if="banner.link" :href="banner.link" target="_blank">
-            <img :src="banner.src" />
+        <div v-for="banner in list" :key="banner._id" class="swiper-slide">
+          <a v-if="banner.banner_url" :href="banner.banner_url" target="_blank">
+            <img :src="banner.banner_url + banner.banner_img" />
           </a>
-          <img v-else :src="banner.src" />
+          <img v-else :src="banner.banner_url + banner.banner_img" />
         </div>
       </div>
       <div class="swiper-pagination swiper-pagination-bullets"></div>

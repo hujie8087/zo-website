@@ -59,6 +59,11 @@ class MarketsController extends BaseController {
         let info = await ctx.model.Markets.find({ _id: { $ne: id } }).limit(4);
         this.success(info);
     }
+    async homeList() {
+        const { ctx } = this;
+        let info = await ctx.model.Markets.find({ is_home: true });
+        this.success(info);
+    }
     async prevNext() {
         const { ctx } = this;
         const { id } = ctx.params;

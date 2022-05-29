@@ -14,8 +14,12 @@ module.exports = (app) => {
         min_img: { type: String, required: false },
         max_img: { type: String, required: false },
         content: { type: String, required: false },
+        is_home: { type: Boolean, require: true, default: false },
     }, {
         collection: 'markets', // 指定collection名，不然系统会默认带s
+        timestamps: {
+            currentTime: () => Math.floor(Date.now() / 1000),
+        },
     });
 
     return mongoose.model('Markets', MarketsSchema);

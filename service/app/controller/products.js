@@ -78,6 +78,11 @@ class ProductsController extends BaseController {
         }
         this.success(activeInfo);
     }
+    async homeList() {
+        const { ctx } = this;
+        let info = await ctx.model.Products.find({ is_home: true }).limit(8);
+        this.success(info);
+    }
 }
 
 module.exports = ProductsController;

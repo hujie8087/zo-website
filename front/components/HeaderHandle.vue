@@ -8,7 +8,14 @@
           </div>
           <div class="header-contact">
             <p style="font-size: 18px">{{ phone }}</p>
-            <p>{{ email }}</p>
+            <p>
+              <a
+                :href="'mailto:' + email"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ email }}</a
+              >
+            </p>
           </div>
         </el-col>
         <el-col :span="4" class="contact-btn">
@@ -52,10 +59,10 @@
 export default {
   data() {
     return {
-      phone: '4000-6622-888',
-      address: '广东省深圳市宝安区西乡街道航城大道 Baltimore, MD 21228',
+      phone: '(615) 741-2286',
+      address: 'Americas Anne Bevis',
       logo: require('../static/logo.png'),
-      email: 'xxx@qq.com',
+      email: 'admat_apac@membzone.com',
       activePath: '/',
       activeColor: '#fdc900',
       menus: [
@@ -137,6 +144,12 @@ export default {
     display: flex;
     justify-content: center;
     flex-direction: column;
+    a {
+      color: #666;
+      &:hover {
+        color: #fdd433;
+      }
+    }
   }
   .contain {
     border-top: 1px solid #b7b7b7;

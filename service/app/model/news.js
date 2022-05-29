@@ -17,6 +17,12 @@ module.exports = (app) => {
         news_source: { type: String, required: false },
         news_content: { type: String, required: true },
         news_img: { type: String, required: false },
+        is_home: { type: Boolean, required: false, default: false },
+    }, {
+        collection: 'news', // 指定collection名，不然系统会默认带s
+        timestamps: {
+            currentTime: () => Math.floor(Date.now() / 1000),
+        },
     });
 
     return mongoose.model('News', NewsSchema);

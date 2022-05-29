@@ -1,6 +1,6 @@
 'use strict';
 const BaseController = require('./base');
-class ArticleController extends BaseController {
+class NewsController extends BaseController {
     async list() {
         const { ctx } = this;
         const { pageSize, pageIndex, typeId, title } = ctx.query;
@@ -60,6 +60,11 @@ class ArticleController extends BaseController {
         let info = await ctx.model.News.find({ _id: { $ne: id } }).limit(4);
         this.success(info);
     }
+    async homeList() {
+        const { ctx } = this;
+        let info = await ctx.model.News.find({ is_home: true }).limit(3);
+        this.success(info);
+    }
     async prevNext() {
         const { ctx } = this;
         const { id } = ctx.params;
@@ -77,4 +82,4 @@ class ArticleController extends BaseController {
     }
 }
 
-module.exports = ArticleController;
+module.exports = NewsController;

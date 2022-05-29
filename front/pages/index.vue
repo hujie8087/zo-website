@@ -34,10 +34,12 @@
               :key="market.src"
               class="swiper-slide"
             >
-              <a :href="'/market/' + market.id" target="_blank">
-                <img class="markets-maxImg" :src="market.maxImg" />
+              <a :href="'/market/' + market._id" target="_blank">
+                <img
+                  class="markets-maxImg"
+                  :src="'http://www.membzone.com/' + market.min_img"
+                />
                 <div class="markets-content">
-                  <img class="markets-minImg" :src="market.minImg" />
                   <span class="markets-name">
                     {{ market.name }}
                   </span>
@@ -53,42 +55,49 @@
     </section>
     <section class="product">
       <div class="container">
-        <div
+        <swiper
           v-if="products.length > 0"
+          ref="productSwiper"
           v-swiper:mySwiper="productOption"
           class="swiperWrap swiperBox product-swiper"
         >
-          <div class="swiper-wrapper">
-            <div v-for="item in products" :key="item.id" class="swiper-slide">
-              <div class="product-content">
-                {{ item.content }}
-              </div>
-              <img class="product-minImg" :src="item.minImg" />
-              <span class="product-title">
-                {{ item.name }}
-              </span>
+          <swiper-slide
+            v-for="item in products"
+            :key="item._id"
+            class="swiper-slide"
+          >
+            <div class="product-content">
+              {{ filterHtml(item.goods_content) }}
             </div>
-          </div>
-          <div class="swiper-button swiper-button-prev">
+            <img
+              class="product-minImg"
+              :src="item.goods_img ? item.goods_img : noImg"
+            />
+            <nuxt-link :to="'/products/' + item._id" class="product-title">{{
+              item.goods_name
+            }}</nuxt-link>
+          </swiper-slide>
+          <div slot="button-prev" class="swiper-button swiper-button-prev">
             <i class="el-icon-arrow-left"></i>
           </div>
-          <!--左箭头。如果放置在swiper外面，需要自定义样式。-->
-          <div class="swiper-button swiper-button-next">
+          <div slot="button-next" class="swiper-button swiper-button-next">
             <i class="el-icon-arrow-right"></i>
           </div>
-          <!--右箭头。如果放置在swiper外面，需要自定义样式。-->
-        </div>
+        </swiper>
       </div>
     </section>
     <section class="service">
       <div class="container">
         <el-row>
           <el-col :span="8">
-            <div class="service-title">Markets</div>
+            <div class="service-title">Global reach, local focus</div>
             <div class="service-tips">
-              We serve a broad and diverse range of consumer and industrial end
-              markets, including: transportation, home life, construction,
-              energy and fuels
+              Join our family of employees, who make sustainable and positive
+              impacts in communities around the world.Since 1970, our
+              innovations have helped to improve the quality of life for
+              millions of people. Today, 19000 employees across more than 30
+              countries work in our four divisions: Polyurethanes, Advanced
+              Materials, Performance Products, and Textile Effects.
             </div>
             <nuxt-link class="service-btn" to="/service">MORE</nuxt-link>
           </el-col>
@@ -102,14 +111,17 @@
               >
                 <el-row>
                   <el-col :span="5">
-                    <img class="service-minImg" :src="item.minImg" />
+                    <img
+                      class="service-minImg"
+                      :src="item.page_img ? item.page_img : noImg"
+                    />
                   </el-col>
                   <el-col :span="16">
                     <div class="service-name">
-                      {{ item.name }}
+                      {{ item.classify_name }}
                     </div>
                     <div class="service-content">
-                      {{ item.content }}
+                      {{ filterHtml(item.classify_intro) }}
                     </div>
                     <nuxt-link class="service-link" :to="'/service/' + item.id"
                       >MORE ></nuxt-link
@@ -147,12 +159,12 @@
         </div>
       </div>
     </section>
-    <section class="clients">
+    <section class="classify">
       <div class="container">
         <el-row :gutter="20">
-          <el-col v-for="item in clients" :key="item.id" :span="6">
-            <div class="clients-img">
-              <img :src="item.imgUrl" />
+          <el-col v-for="item in classifyList" :key="item.id" :span="6">
+            <div class="classify-img">
+              <img :src="'http://www.membzone.com/' + item.classify_img" />
             </div>
           </el-col>
         </el-row>
@@ -236,20 +248,25 @@
           </el-col>
         </el-row>
         <el-row class="news-list" :gutter="50">
-          <el-col v-for="item in newsList" :key="item.id" :span="8">
+          <el-col v-for="item in newsList" :key="item._id" :span="8">
             <div class="news-item">
-              <img :src="item.imgUrl" :alt="item.name" />
-              <div class="news-wrap">
-                <div class="news-date">
-                  <i class="el-icon-time el-icon"></i>{{ item.createData }}
-                </div>
-                <div class="news-name">
-                  {{ item.name }}
-                </div>
-                <div class="news-content">
-                  {{ item.content }}
-                </div>
-              </div>
+              <nuxt-link :to="'/news' + item._id">
+                <img
+                  :src="item.news_img ? item.news_img : noImg"
+                  :alt="item.name"
+                />
+                <div class="news-wrap">
+                  <div class="news-date">
+                    <i class="el-icon-time el-icon"></i>{{ item.create_date }}
+                  </div>
+                  <div class="news-name">
+                    {{ item.news_title }}
+                  </div>
+                  <div class="news-content">
+                    {{ filterHtml(item.news_content) }}
+                  </div>
+                </div></nuxt-link
+              >
             </div>
           </el-col>
         </el-row>
@@ -265,9 +282,10 @@
 </template>
 
 <script>
+import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import SwiperCpt from '../components/SwiperCpt.vue'
 export default {
-  components: { SwiperCpt },
+  components: { SwiperCpt, swiper, swiperSlide },
   data() {
     return {
       swiperOption: {
@@ -287,23 +305,26 @@ export default {
           type: 'bullets',
         },
       },
-      productOption: {},
-      banners: [
-        {
-          src: require('../static/images/banner/banner.jpg'),
-          link: '/',
+      productOption: {
+        loop: true,
+        slidesPerView: 1, // 一页显示几个
+        spaceBetween: 0, // 间隔
+        autoplay: {
+          // 自动轮播
+          delay: 5000,
         },
-        {
-          src: require('../static/images/banner/banner1.jpg'),
-          link: '/',
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
         },
-      ],
+      },
+      banners: [],
       marketsList: [],
       products: [],
       initStatus: false,
       services: [],
       caseList: [],
-      clients: [],
+      classifyList: [],
       newsList: [],
       homeForm: {
         name: '',
@@ -332,27 +353,15 @@ export default {
           },
         ],
       },
+      noImg: require('../static/images/no-img.png'),
     }
   },
   created() {
     this.getData()
+  },
+  mounted() {
     this.$nextTick(() => {
-      this.productOption = {
-        loop: true,
-        centeredSlides: true,
-        slidesPerView: 1, // 一页显示几个
-        spaceBetween: 0, // 间隔
-        slidesPerGroup: 1,
-        autoplay: {
-          // 自动轮播
-          delay: 3000,
-          disableOnInteraction: true, // 操作swiper后 自动轮播不会停止
-        },
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      }
+      console.log(this.$refs.productSwiper)
       this.caseOption = {
         loop: true,
         centeredSlides: true,
@@ -372,11 +381,20 @@ export default {
       }
       this.initStatus = true // 渲染swiper
     })
+    // this.$refs.productSwiper.$swiper.init()
   },
   methods: {
     getData() {
       this.$http
-        .get('/getHomeMarkets')
+        .get('/banner/home')
+        .then((result) => {
+          this.banners = result.data
+        })
+        .catch((err) => {
+          this.$message.error(err)
+        })
+      this.$http
+        .get('/markets/homeList')
         .then((result) => {
           this.marketsList = result.data
         })
@@ -384,7 +402,7 @@ export default {
           this.$message.error(err)
         })
       this.$http
-        .get('/getHomeProducts')
+        .get('/products/homeList')
         .then((result) => {
           this.products = result.data
           this.initStatus = true
@@ -392,32 +410,25 @@ export default {
         .catch((err) => {
           this.$message.error(err)
         })
+      // this.$http
+      //   .get('/getHomeCase')
+      //   .then((result) => {
+      //     this.caseList = result.data
+      //   })
+      //   .catch((err) => {
+      //     this.$message.error(err)
+      //   })
       this.$http
-        .get('/getHomeServices')
+        .get('/classify/homeList')
         .then((result) => {
-          this.services = result.data
+          this.classifyList = result.data.classifyList
+          this.services = result.data.servicesList
         })
         .catch((err) => {
           this.$message.error(err)
         })
       this.$http
-        .get('/getHomeCase')
-        .then((result) => {
-          this.caseList = result.data
-        })
-        .catch((err) => {
-          this.$message.error(err)
-        })
-      this.$http
-        .get('/getHomeClitents')
-        .then((result) => {
-          this.clients = result.data
-        })
-        .catch((err) => {
-          this.$message.error(err)
-        })
-      this.$http
-        .get('/getHomeNews')
+        .get('/news/homeList')
         .then((result) => {
           this.newsList = result.data
         })
@@ -436,7 +447,19 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          this.$http
+            .post('/message/create', this.homeForm)
+            .then((result) => {
+              if (result.code === 0) {
+                this.$message.success(result.message)
+                this.$refs[formName].resetFields()
+              } else {
+                this.$message.error('Failed to leave a message')
+              }
+            })
+            .catch((err) => {
+              this.$message.error(err.message)
+            })
         } else {
           console.log('error submit!!')
           return false
@@ -445,6 +468,9 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+    },
+    filterHtml(val) {
+      return val ? val.replace(/<.*?>/g, '') : ''
     },
   },
 }
@@ -538,12 +564,19 @@ export default {
     margin-bottom: 70px;
     font-size: 16px;
     line-height: 35px;
+    max-height: 140px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    overflow: hidden;
     width: 100%;
   }
   &-minImg {
     border-bottom: 4px solid #fdc900;
     display: inline-block;
     margin-right: 40px;
+    width: 70px;
   }
   &-title {
     line-height: 48px;
@@ -551,6 +584,9 @@ export default {
     font-size: 18px;
     font-weight: bold;
     vertical-align: top;
+    &:hover {
+      text-decoration: underline;
+    }
   }
   .swiper-button {
     height: 65px;
@@ -580,6 +616,10 @@ export default {
 }
 .service {
   padding: 40px 0;
+  &-minImg {
+    width: 60px;
+    height: 60px;
+  }
   &-title {
     font-size: 20px;
     font-weight: bold;
@@ -667,7 +707,7 @@ export default {
     text-align: center;
   }
 }
-.clients {
+.classify {
   padding: 40px 0;
   &-img {
     border: 3px solid #b7b7b7;
@@ -753,6 +793,11 @@ export default {
       width: 100%;
       height: auto;
     }
+    &:hover {
+      .news-name {
+        color: #fdc900;
+      }
+    }
   }
   &-wrap {
     padding: 20px 30px;
@@ -771,6 +816,9 @@ export default {
     font-weight: bold;
     height: 40px;
     line-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   &-content {
     line-height: 25px;
