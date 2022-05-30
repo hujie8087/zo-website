@@ -48,6 +48,7 @@
             </div>
           </div>
           <div
+            slot="pagination"
             class="markets-pagination swiper-pagination swiper-pagination-bullets"
           ></div>
         </div>
@@ -55,35 +56,28 @@
     </section>
     <section class="product">
       <div class="container">
-        <swiper
+        <div
           v-if="products.length > 0"
-          ref="productSwiper"
           v-swiper:mySwiper="productOption"
-          class="swiperWrap swiperBox product-swiper"
+          class="swiperWrap swiperBox products-swiper"
         >
-          <swiper-slide
-            v-for="item in products"
-            :key="item._id"
-            class="swiper-slide"
-          >
-            <div class="product-content">
-              {{ filterHtml(item.goods_content) }}
+          <div class="swiper-wrapper">
+            <div v-for="item in products" :key="item.src" class="swiper-slide">
+              <div class="product-content">
+                {{ filterHtml(item.goods_content) }}
+              </div>
+              <img
+                class="product-minImg"
+                :src="item.goods_img ? item.goods_img : noImg"
+              />
+              <nuxt-link :to="'/products/' + item._id" class="product-title">{{
+                item.goods_name
+              }}</nuxt-link>
             </div>
-            <img
-              class="product-minImg"
-              :src="item.goods_img ? item.goods_img : noImg"
-            />
-            <nuxt-link :to="'/products/' + item._id" class="product-title">{{
-              item.goods_name
-            }}</nuxt-link>
-          </swiper-slide>
-          <div slot="button-prev" class="swiper-button swiper-button-prev">
-            <i class="el-icon-arrow-left"></i>
           </div>
-          <div slot="button-next" class="swiper-button swiper-button-next">
-            <i class="el-icon-arrow-right"></i>
-          </div>
-        </swiper>
+          <div class="prev-button swiper-button swiper-button-prev"></div>
+          <div class="next-button swiper-button swiper-button-next"></div>
+        </div>
       </div>
     </section>
     <section class="service">
@@ -282,42 +276,13 @@
 </template>
 
 <script>
-import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import SwiperCpt from '../components/SwiperCpt.vue'
 export default {
-  components: { SwiperCpt, swiper, swiperSlide },
+  components: { SwiperCpt },
   data() {
     return {
-      swiperOption: {
-        loop: true,
-        centeredSlides: true,
-        slidesPerView: 3, // 一页显示几个
-        spaceBetween: 20, // 间隔
-        slidesPerGroup: 3,
-        autoplay: {
-          // 自动轮播
-          delay: 3000,
-          disableOnInteraction: true, // 操作swiper后 自动轮播不会停止
-        },
-        pagination: {
-          el: '.markets-pagination',
-          clickable: true,
-          type: 'bullets',
-        },
-      },
-      productOption: {
-        loop: true,
-        slidesPerView: 1, // 一页显示几个
-        spaceBetween: 0, // 间隔
-        autoplay: {
-          // 自动轮播
-          delay: 5000,
-        },
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      },
+      swiperOption: {},
+      productOption: {},
       banners: [],
       marketsList: [],
       products: [],
@@ -361,7 +326,6 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      console.log(this.$refs.productSwiper)
       this.caseOption = {
         loop: true,
         centeredSlides: true,
@@ -379,9 +343,38 @@ export default {
           type: 'bullets',
         },
       }
+      this.swiperOption = {
+        loop: true,
+        centeredSlides: true,
+        slidesPerView: 3, // 一页显示几个
+        spaceBetween: 20, // 间隔
+        slidesPerGroup: 3,
+        autoplay: {
+          // 自动轮播
+          delay: 3000,
+          disableOnInteraction: true, // 操作swiper后 自动轮播不会停止
+        },
+        pagination: {
+          el: '.markets-pagination',
+          clickable: true,
+          type: 'bullets',
+        },
+      }
+      this.productOption = {
+        loop: true,
+        slidesPerView: 1, // 一页显示几个
+        spaceBetween: 0, // 间隔
+        autoplay: {
+          // 自动轮播
+          delay: 5000,
+        },
+        navigation: {
+          nextEl: '.next-button',
+          prevEl: '.prev-button',
+        },
+      }
       this.initStatus = true // 渲染swiper
     })
-    // this.$refs.productSwiper.$swiper.init()
   },
   methods: {
     getData() {
@@ -595,15 +588,12 @@ export default {
     background: #333333;
     top: auto;
     bottom: 40px;
-    i {
-      display: block;
-      line-height: 65px;
-      text-align: center;
-      color: #ffffff;
-      font-size: 30px;
-    }
     &:hover {
       background-color: #fdc900;
+    }
+    &:after {
+      color: #ffffff;
+      font-size: 30px;
     }
   }
   .swiper-button-prev {

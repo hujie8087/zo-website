@@ -60,10 +60,10 @@
 export default {
   data() {
     return {
-      phone: '4000-6622-888',
-      address: '广东省深圳市宝安区西乡街道航城大道 Baltimore, MD 21228',
+      phone: '(615) 741-2286',
+      address: 'Americas Anne Bevis',
       logo: require('../static/logo.png'),
-      email: 'xxx@qq.com',
+      email: 'admat_apac@membzone.com',
       menus: [
         {
           key: 'Markets',

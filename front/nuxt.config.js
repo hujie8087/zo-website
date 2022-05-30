@@ -19,17 +19,14 @@ export default {
     // Global CSS: https://go.nuxtjs.dev/config-css
     css: [
         'element-ui/lib/theme-chalk/index.css',
-        '@/assets/scss/element-variables.scss',
+        '@/static/css/element-variables.scss',
     ],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
-        '@/plugins/element-ui',
+        { src: '@/plugins/element-ui', srr: true },
         '@/plugins/axios',
-        {
-            src: '@/plugins/vue-swiper',
-            ssr: false,
-        },
+        { src: '@/plugins/vue-swiper', ssr: false },
     ],
 
     // Auto import components: https://go.nuxtjs.dev/config-components

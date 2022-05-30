@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="initStatus"
-      v-swiper:mySwiper="swiperOption"
+      v-swiper:mySwiper="bannerOption"
       :class="cusClass + ' swiperWrap swiperBox ' + swpName"
     >
       <div class="swiper-wrapper">
@@ -14,13 +14,9 @@
         </div>
       </div>
       <div class="swiper-pagination swiper-pagination-bullets"></div>
-      <div class="swiper-button swiper-button-prev">
-        <i class="el-icon-arrow-left"></i>
-      </div>
+      <div class="swiper-button swiper-button-prev"></div>
       <!--左箭头。如果放置在swiper外面，需要自定义样式。-->
-      <div class="swiper-button swiper-button-next">
-        <i class="el-icon-arrow-right"></i>
-      </div>
+      <div class="swiper-button swiper-button-next"></div>
       <!--右箭头。如果放置在swiper外面，需要自定义样式。-->
     </div>
   </div>
@@ -75,22 +71,20 @@ export default {
     return {
       initStatus: false, // 初始化状态
       swpName: this.roundString(), // swiper的类名
-      swiperOption: {}, // swiper参数
+      bannerOption: {}, // swiper参数
     }
   },
   mounted() {
     const self = this
-
     this.$nextTick(() => {
-      this.swiperOption = {
-        loop: self.loop,
+      this.bannerOption = {
+        loop: true,
         centeredSlides: true,
         slidesPerView: self.slidesPerView, // 一页显示几个
         spaceBetween: self.spaceBetween, // 间隔
         autoplay: {
           // 自动轮播
           delay: self.delay,
-          disableOnInteraction: false, // 操作swiper后 自动轮播不会停止
         },
         pagination: {
           el: '.swiper-pagination',
@@ -175,6 +169,12 @@ export default {
     }
     &:hover {
       background-color: #fdc900;
+    }
+  }
+  .swiper-button {
+    color: #fff;
+    &:after {
+      font-size: 30px;
     }
   }
   .swiper-button-prev {
