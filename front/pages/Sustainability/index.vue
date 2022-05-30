@@ -3,6 +3,7 @@
     <default-banner
       :img-url="bannerOptions.bannerImg"
       :title="bannerOptions.title"
+      cus-class="height-auto"
     />
     <div class="container">
       <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
@@ -13,51 +14,108 @@
       </el-breadcrumb>
       <div class="category-navigation">
         <nuxt-link
-          v-for="solutionType in solutionTypeList"
-          :key="solutionType.id"
-          :to="'solution?type=' + solutionType.id"
+          v-for="item in solutionTypeList"
+          :key="item.id"
+          :to="'/sustainability' + item.url"
         >
-          {{ solutionType.name }}
+          {{ item.name }}
         </nuxt-link>
       </div>
-      <el-row class="solution-list" :gutter="50">
-        <el-col
-          v-for="item in solutionList"
-          :key="item.id"
-          :span="12"
-          class="item"
-        >
-          <el-row>
-            <el-col :span="16">
-              <div class="title">
-                <nuxt-link :to="'/solutions/' + item.id">
-                  {{ item.title }}
-                </nuxt-link>
-              </div>
-              <div class="content">
-                {{ item.content }}
-              </div>
-              <div class="link">
-                <nuxt-link :to="'/solutions/' + item.id">MORE ></nuxt-link>
-              </div></el-col
-            >
-            <el-col :span="8">
-              <img :src="item.imgUrl" alt="" srcset="" />
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
-      <el-pagination
-        class="pagination"
-        background
-        layout="total,prev, pager, next"
-        :current-page.sync="pageParams.currentPage"
-        :page-size="pageParams.pageSize"
-        :total="total"
-        @current-change="handleCurrentChange"
-      >
-      </el-pagination>
     </div>
+    <section>
+      <div v-if="isLoading" class="sustainability-item">
+        <div
+          class="img"
+          :style="
+            'background: url(http://www.membzone.com/' +
+            solutionList[0].img +
+            ') no-repeat;'
+          "
+        ></div>
+        <el-row class="container">
+          <el-col :sm="12" :md="10">
+            <h2>
+              {{ solutionList[0].name }}
+            </h2>
+            <p v-html="solutionList[0].intro"></p>
+            <nuxt-link :to="solutionList[0].url">{{
+              solutionList[0].sub_name
+            }}</nuxt-link>
+          </el-col>
+        </el-row>
+      </div>
+    </section>
+    <section class="sustain">
+      <div v-if="isLoading" class="container">
+        <el-row>
+          <el-col :span="12">
+            <h2>
+              {{ solutionList[1].name }}
+            </h2>
+            <p v-html="solutionList[1].intro"></p>
+            <nuxt-link :to="solutionList[1].url">{{
+              solutionList[1].sub_name
+            }}</nuxt-link>
+          </el-col>
+        </el-row>
+        <div class="img-list">
+          <img
+            v-for="url in solutionList[1].img.split(',')"
+            :key="url"
+            :src="'http://www.membzone.com/' + url"
+            alt="View 2019 Report"
+          />
+        </div>
+      </div>
+    </section>
+    <section class="follow">
+      <div v-if="isLoading" class="container">
+        <div class="follow-img">
+          <img :src="'http://www.membzone.com/' + solutionList[2].img" alt="" />
+        </div>
+        <h2>
+          {{ solutionList[2].name }}
+        </h2>
+        <p v-html="solutionList[2].intro"></p>
+        <nuxt-link :to="solutionList[2].url">{{
+          solutionList[2].sub_name
+        }}</nuxt-link>
+      </div>
+    </section>
+    <section>
+      <div v-if="isLoading" class="sustainability-item">
+        <div
+          class="left-img img"
+          :style="
+            'background: url(http://www.membzone.com/' +
+            solutionList[3].img +
+            ') no-repeat;'
+          "
+        ></div>
+        <el-row class="container">
+          <el-col :sm="12" :md="10" :offset="14">
+            <h2>
+              {{ solutionList[3].name }}
+            </h2>
+            <p v-html="solutionList[3].intro"></p>
+            <nuxt-link :to="solutionList[3].url">{{
+              solutionList[3].sub_name
+            }}</nuxt-link>
+          </el-col>
+        </el-row>
+      </div>
+    </section>
+    <section v-if="isLoading" class="partnering follow">
+      <div class="container">
+        <h2>
+          {{ solutionList[4].name }}
+        </h2>
+        <p v-html="solutionList[4].intro"></p>
+        <nuxt-link :to="solutionList[4].url">{{
+          solutionList[4].sub_name
+        }}</nuxt-link>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -72,35 +130,40 @@ export default {
         bannerImg: require('../../static/images/banner/news-banner.jpg'),
         title: 'SOLUTION CENTER',
       },
-      solutionTypeList: [
-        {
-          name: '成功方案',
-          id: 100,
-        },
-        {
-          name: '解决方案',
-          id: 101,
-        },
-      ],
+      typeId: '',
+      solutionTypeList: [],
       solutionList: [],
-      pageParams: {
-        currentPage: 1,
-        pageSize: 6,
-      },
-      total: 0,
+      isLoading: false,
     }
   },
   created() {
-    this.getNewsList()
+    this.getDate()
   },
   methods: {
-    getNewsList() {
+    getDate() {
       this.$http
-        .get('/getNewsList', { current: this.pageParams.currentPage })
+        .get('/sustainability/typeList')
+        .then((result) => {
+          this.solutionTypeList = result.data
+          this.typeId = this.solutionTypeList[0]._id
+          this.bannerOptions = {
+            bannerImg:
+              'http://www.membzone.com/' + this.solutionTypeList[0].banner,
+            title: 'Sustainability',
+          }
+          this.getListDate()
+        })
+        .catch((err) => {
+          this.$message.error(err)
+        })
+    },
+    getListDate() {
+      console.log(this.typeId)
+      this.$http
+        .get('/sustainability', { params: { typeId: this.typeId } })
         .then((result) => {
           this.solutionList = result.data
-          this.initStatus = true
-          this.total = result.total
+          this.isLoading = true
         })
         .catch((err) => {
           this.$message.error(err)
@@ -120,13 +183,13 @@ export default {
   height: 40px;
   line-height: 40px;
   font-size: 16px;
-  margin: 40px 0;
+  margin: 10px 0;
   a {
     display: block;
-    width: 110px;
     height: 40px;
     text-align: center;
     float: left;
+    padding: 0 10px;
     color: #333333;
     background-color: #fdc900;
     margin-right: 30px;
@@ -142,65 +205,98 @@ export default {
     color: #ffffff;
   }
 }
-.solution-list {
-  .item {
-    .el-row {
-      margin-bottom: 30px;
-      border-bottom: 1px solid #e9e9e9;
-      padding-bottom: 30px;
-    }
-    .title {
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      a {
-        color: #333333;
-      }
-      a:hover {
-        color: #fdc900;
-      }
-    }
-    .content {
-      height: 50px;
-      line-height: 25px;
-      font-size: 14px;
-      color: #666;
-      max-width: 80%;
-      word-break: break-all;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2; /* 这里是超出几行省略 */
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    img {
-      width: 100%;
-      height: auto;
-    }
-    .link a {
-      font-size: 16px;
-      color: #fdc900;
-      font-weight: bold;
+.sustainability-item {
+  width: 100%;
+  position: relative;
+  padding: 120px 0;
+  .img {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #333;
+    background-position: 50% 50%;
+  }
+  .left-img {
+    right: auto;
+    left: 0;
+  }
+  h2 {
+    margin-bottom: 20px;
+  }
+  a {
+    color: #fff;
+    border: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: block;
+    background: #fdc900;
+    display: inline-block;
+    font-size: 14px;
+    padding: 15px;
+    font-weight: bold;
+    margin-top: 30px;
+    border-radius: 5px;
+    &:hover {
+      background-color: #000;
     }
   }
 }
-.pagination {
-  text-align: center;
-  margin: 50px 0;
-  /deep/ button,
-  /deep/ span:not([class*='suffix']) {
-    font-size: 16px;
-    min-width: 40px;
-    height: 40px;
-    line-height: 40px;
+.sustain {
+  background-color: #e7e7e6;
+  padding: 50px 0;
+  h2 {
+    margin-bottom: 20px;
   }
-  /deep/ .el-pager li {
-    width: 40px;
-    margin: 0 8px;
-    height: 40px;
-    font-size: 16px;
-    line-height: 40px;
+  .img-list {
+    margin-top: 30px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+.follow {
+  background-color: #00838a;
+  color: #fff;
+  text-align: center;
+  padding: 60px 0;
+  h2 {
+    margin-bottom: 20px;
+  }
+  p {
+    width: 800px;
+    margin: 0 auto;
+  }
+  a {
+    color: #fff;
+    border: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: block;
+    background: #fdc900;
+    display: inline-block;
+    font-size: 14px;
+    padding: 15px;
+    font-weight: bold;
+    margin-top: 30px;
+    border-radius: 5px;
+    &:hover {
+      background-color: #000;
+    }
+  }
+}
+.partnering {
+  padding: 100px 0;
+  background: url('../../static/images/background/background_image3.jpg')
+    no-repeat top center;
+  position: relative;
+  &:before {
+    background-color: rgba(0, 131, 138, 0.7);
+    content: '';
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
   }
 }
 </style>

@@ -80,4 +80,11 @@ module.exports = (app) => {
         router.get('/homeList', homeList);
         router.get('/', homeList);
     });
+    router.group({ name: 'sustainability', prefix: '/sustainability' },
+        (router) => {
+            let { index, typeList } = controller.sustainability;
+            router.get('/typeList', typeList);
+            router.get('/', index);
+        }
+    );
 };
