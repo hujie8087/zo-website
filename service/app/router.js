@@ -87,4 +87,12 @@ module.exports = (app) => {
             router.get('/', index);
         }
     );
+    router.group({ name: 'guanli', prefix: '/guanli' }, (router) => {
+        let { index } = controller.guanli;
+        router.get('/', index);
+    });
+    router.group({ name: 'imgPic', prefix: '/imgPic' }, (router) => {
+        let { index } = controller.imgPic;
+        router.get('/', index);
+    });
 };
