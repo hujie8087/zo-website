@@ -1,5 +1,5 @@
 <template>
-  <header class="header">
+  <header class="header" :class="isFixed ? '' : 'isFixed'">
     <div class="container">
       <el-row>
         <el-col :span="20" :offset="0">
@@ -41,13 +41,42 @@
             class="header-menu"
             @select="handleSelect"
           >
-            <el-menu-item
-              v-for="item in menus"
-              :key="item.key"
-              :index="item.path"
-            >
-              {{ item.title }}
-            </el-menu-item>
+            <template v-for="item in menus">
+              <template v-if="item.subs">
+                <el-submenu :key="item.key" :index="item.path">
+                  <template #title>
+                    <span>{{ item.title }}</span>
+                  </template>
+                  <template v-for="subItem in item.subs">
+                    <el-submenu
+                      v-if="subItem.subs"
+                      :key="subItem.key"
+                      :index="subItem.path"
+                    >
+                      <template #title>{{ subItem.title }}</template>
+                      <el-menu-item
+                        v-for="(threeItem, i) in subItem.subs"
+                        :key="i"
+                        :index="threeItem.path"
+                      >
+                        {{ threeItem.title }}</el-menu-item
+                      >
+                    </el-submenu>
+                    <el-menu-item
+                      v-else
+                      :key="subItem.path"
+                      :index="subItem.path"
+                      >{{ subItem.title }}
+                    </el-menu-item>
+                  </template>
+                </el-submenu>
+              </template>
+              <template v-else>
+                <el-menu-item :key="item.key" :index="item.path">
+                  <template #title>{{ item.title }}</template>
+                </el-menu-item>
+              </template>
+            </template>
           </el-menu>
         </el-col>
       </el-row>
@@ -65,6 +94,7 @@ export default {
       email: 'admat_apac@membzone.com',
       activePath: '/',
       activeColor: '#fdc900',
+      isFixed: false,
       menus: [
         {
           key: 'index',
@@ -90,6 +120,13 @@ export default {
           key: 'News',
           path: '/news',
           title: 'News',
+          subs: [
+            {
+              key: 'Company News',
+              path: '/news',
+              title: 'Company News',
+            },
+          ],
         },
         {
           key: 'About',
@@ -107,6 +144,9 @@ export default {
   created() {
     this.activePath = this.$route.path
   },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll)
+  },
   methods: {
     contactHandle() {
       console.log(11)
@@ -114,12 +154,31 @@ export default {
     handleSelect(val) {
       console.log(val)
     },
+    handleScroll() {
+      const scrollTop =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop // 滚动条偏移量
+      const offsetTop = document.querySelector('.header').offsetTop // 要滚动到顶部吸附的元素的偏移量
+      this.isFixed = scrollTop > offsetTop
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: #fff;
+  transition: 0.3s all;
+  .container {
+    height: 0;
+    overflow: hidden;
+    transition: 0.3s height;
+  }
   &-address {
     padding-left: 50px;
     background: url('../static/images/address.png') no-repeat left center;
@@ -174,6 +233,7 @@ export default {
     line-height: 40px;
     margin-top: 20px;
     float: right;
+    background-color: transparent;
     > .el-menu-item,
     > .el-submenu {
       height: 40px;
@@ -181,12 +241,21 @@ export default {
       font-size: 16px;
       font-weight: bold;
       border-bottom: 0;
+      background-color: transparent !important;
     }
     /deep/ .el-submenu__title {
       height: 40px;
       line-height: 40px;
       font-size: 16px;
+      border-bottom: 0 !important;
+      background-color: transparent !important;
     }
+  }
+}
+.isFixed {
+  background-color: rgba(255, 255, 255, 0.7);
+  .container {
+    height: 66px;
   }
 }
 </style>

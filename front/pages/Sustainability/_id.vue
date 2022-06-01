@@ -9,30 +9,33 @@
         <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
           <el-breadcrumb-item
-            ><a href="/solutions">Solutions</a></el-breadcrumb-item
+            ><a href="/sustainability">Sustainability</a></el-breadcrumb-item
           >
+          <el-breadcrumb-item>Impact</el-breadcrumb-item>
         </el-breadcrumb>
         <div class="title">
-          {{ detail.title }}
+          {{ detail.t_title }}
         </div>
         <div class="date">
-          {{ detail.createDate }}
+          {{ setCreateDate(detail.date) }}
         </div>
         <div class="content">
-          {{ detail.content }}
+          <p v-html="detail.t_detail"></p>
         </div>
+        <div></div>
         <div class="prev-next">
           <nuxt-link
-            :to="prevNext.prev ? '/solutions/' + prevNext.prev.id : ''"
+            :to="prevNext.prev ? '/sustainability/' + prevNext.prev._id : ''"
           >
-            Prev:{{ prevNext.prev ? prevNext.prev.title : 'none' }}
+            Prev:{{ prevNext.prev ? prevNext.prev.t_title : 'none' }}
           </nuxt-link>
           <nuxt-link
-            :to="prevNext.next ? '/solutions/' + prevNext.next.id : ''"
+            :to="prevNext.next ? '/sustainability/' + prevNext.next._id : ''"
           >
-            Next:{{ prevNext.next ? prevNext.next.title : 'none' }}
+            Next:{{ prevNext.next ? prevNext.next.t_title : 'none' }}
           </nuxt-link>
         </div>
+        <el-button type="primary" @click="goBack">View All Articles</el-button>
         <div class="relevant">
           <div class="relevant-head"><span>Relevant solutions</span></div>
           <el-row class="relevant-list">
@@ -51,11 +54,11 @@
                 </el-col>
                 <el-col :span="20">
                   <div class="relevant-title">
-                    <nuxt-link :to="'/solutions/' + item.id">{{
-                      item.title
+                    <nuxt-link :to="'/sustainability/' + item._id">{{
+                      item.t_title
                     }}</nuxt-link>
                   </div>
-                  <div class="relevant-content">{{ item.content }}</div>
+                  <div class="relevant-content">{{ item.t_intro }}</div>
                 </el-col>
               </el-row>
             </el-col>
@@ -77,39 +80,51 @@ export default {
         bannerImg: require('../../static/images/banner/news-banner.jpg'),
         title: 'NEWS CENTER',
       },
-      detail: {
-        title: '',
-        createDate: '',
-        content: '',
-      },
+      detail: {},
       prevNext: {},
       solutionsRelative: [],
     }
   },
   created() {
-    console.log(this.$route.params)
+    this.$http
+      .get('/banner?banner_id=7')
+      .then((result) => {
+        this.bannerOptions = {
+          bannerImg: result.data.banner_url + result.data.banner_img,
+          title: result.data.banner_title,
+        }
+      })
+      .catch((err) => {
+        this.$message.error(err)
+      })
     this.getDetail()
   },
   methods: {
     getDetail() {
-      this.$http.get(`/newsDetail`).then((result) => {
+      this.$http.get(`/textI/${this.$route.params.id}`).then((result) => {
         this.detail = result.data
       })
       this.$http
-        .get(`/newsPrevNext`, { id: this.$route.params.id })
+        .get(`/textI/prevNext/${this.$route.params.id}`)
         .then((result) => {
           this.prevNext = result.data
         })
-      this.$http.get('/newsRelative').then((res) => {
+      this.$http.get(`/textI/relative/${this.$route.params.id}`).then((res) => {
         this.solutionsRelative = res.data
       })
     },
     setDate(val, year) {
       if (year) {
-        return moment(val).format('yyyy')
+        return moment(val * 1000).format('yyyy')
       } else {
-        return moment(val).format('MM/DD')
+        return moment(val * 1000).format('MM/DD')
       }
+    },
+    setCreateDate(val) {
+      return moment(val * 1000).format('yyyy-MM-DD')
+    },
+    goBack() {
+      this.$router.go(-1)
     },
   },
 }

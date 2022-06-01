@@ -95,4 +95,15 @@ module.exports = (app) => {
         let { index } = controller.imgPic;
         router.get('/', index);
     });
+    router.group({ name: 'textI', prefix: '/textI' }, (router) => {
+        let { index, detail, prevNext, relative } = controller.textI;
+        router.get('/prevNext/:id', prevNext);
+        router.get('/relative/:id', relative);
+        router.get('/:id', detail);
+        router.get('/', index);
+    });
+    router.group({ name: 'textType', prefix: '/textType' }, (router) => {
+        let { index } = controller.textType;
+        router.get('/', index);
+    });
 };

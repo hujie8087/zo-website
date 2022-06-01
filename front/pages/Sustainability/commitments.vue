@@ -9,7 +9,7 @@
       <el-breadcrumb separator="/" style="height: 50px; line-height: 50px">
         <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
         <el-breadcrumb-item
-          ><a href="/solution">Solution</a></el-breadcrumb-item
+          ><a href="/sustainability">Sustainability</a></el-breadcrumb-item
         >
       </el-breadcrumb>
       <div class="category-navigation">

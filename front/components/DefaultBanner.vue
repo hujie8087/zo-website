@@ -41,14 +41,14 @@ export default {
 <style lang="scss" scoped>
 .banner {
   width: 100%;
-  height: 300px;
+  height: auto;
   position: relative;
   overflow: hidden;
   img {
     width: 1920px;
-    height: 300px;
+    height: auto;
     min-width: 1920px;
-    min-height: 300px;
+    height: auto;
     left: 50%;
     position: relative;
     margin-left: -960px;
@@ -72,13 +72,6 @@ export default {
       font-size: 20px;
       line-height: 80px;
     }
-  }
-}
-.height-auto {
-  height: auto;
-  img {
-    height: auto;
-    min-height: auto;
   }
 }
 </style>

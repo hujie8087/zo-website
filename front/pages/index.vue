@@ -174,9 +174,9 @@
                 For any kind of query, contact us with the details below.
               </div>
               <div class="message-list">
-                <p>4000 662 228</p>
-                <p>xxxx@xxxx.com</p>
-                <p>广东省深圳市宝安区西乡街道航城大道</p>
+                <p>(615) 741-2286</p>
+                <p>admat_apac@membzone.com</p>
+                <p>Americas Anne Bevis</p>
               </div>
             </div>
           </el-col>
@@ -244,7 +244,7 @@
         <el-row class="news-list" :gutter="50">
           <el-col v-for="item in newsList" :key="item._id" :span="8">
             <div class="news-item">
-              <nuxt-link :to="'/news' + item._id">
+              <nuxt-link :to="'/news/' + item._id">
                 <img
                   :src="item.news_img ? item.news_img : noImg"
                   :alt="item.name"
@@ -265,12 +265,6 @@
           </el-col>
         </el-row>
       </div>
-    </section>
-    <section class="links container">
-      <span>Links:</span>
-      <nuxt-link v-for="item in links" :key="item._id" :to="item.link_url">{{
-        item.link_name
-      }}</nuxt-link>
     </section>
   </div>
 </template>
@@ -296,7 +290,6 @@ export default {
         content: '',
         email: '',
       },
-      links: [],
       rules: {
         name: [
           {
@@ -428,14 +421,6 @@ export default {
         .catch((err) => {
           this.$message.error(err)
         })
-      this.$http
-        .get('/links')
-        .then((result) => {
-          this.links = result.data
-        })
-        .catch((err) => {
-          this.$message.error(err)
-        })
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -471,7 +456,11 @@ export default {
 
 <style lang="scss" scoped>
 .markets {
-  margin: 60px 0 40px;
+  margin: -180px 0 0px;
+  position: relative;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 60px 0;
   &-title {
     font-size: 28px;
     font-weight: bold;
@@ -713,7 +702,7 @@ export default {
 }
 .message {
   background: url('../static/images/home-message-bg.jpg') no-repeat center;
-  background-size: contain;
+  background-size: 1920px;
   height: 670px;
   padding: 40px 0;
   &-box {
@@ -819,19 +808,6 @@ export default {
     word-break: normal;
     height: 50px;
     overflow: hidden;
-  }
-}
-.links {
-  padding: 30px 0;
-  line-height: 25px;
-  font-size: 16px;
-  color: #666;
-  a {
-    color: #666;
-    margin-left: 20px;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 }
 </style>
